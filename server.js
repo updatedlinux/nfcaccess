@@ -24,8 +24,9 @@ const {
     swaggerUILocal 
 } = require('./middleware/swaggerLocal');
 const { 
-    swaggerInterceptor 
-} = require('./middleware/swaggerInterceptor');
+    swaggerSimpleFix,
+    oauth2RedirectSimple
+} = require('./middleware/swaggerSimple');
 
 // Importar rutas
 const cardsRoutes = require('./routes/cards');
@@ -147,13 +148,7 @@ const swaggerOptions = {
             }
         ],
         // Configuración adicional para funcionalidad completa
-        supportedSubmitMethods: ['get', 'post', 'put', 'delete', 'patch'],
-        onComplete: function() {
-            console.log('Swagger UI cargado correctamente');
-        },
-        onFailure: function(data) {
-            console.error('Error al cargar Swagger UI:', data);
-        }
+        supportedSubmitMethods: ['get', 'post', 'put', 'delete', 'patch']
     }
 };
 
@@ -162,12 +157,9 @@ app.use('/api-docs', swaggerCorsHandler);
 app.use('/api-docs', swaggerProxyHandler);
 app.use('/api-docs', swaggerStaticHandler);
 
-// Middleware para interceptar y corregir URLs de Swagger UI
-app.use('/api-docs', swaggerInterceptor(basePath));
-
-// Middleware para interceptar y corregir redirecciones de Swagger UI
-app.use('/api-docs', swaggerUIFix(basePath));
-app.use('/api-docs', oauth2RedirectHandler(basePath));
+// Middleware simple para corregir URLs
+app.use('/api-docs', swaggerSimpleFix(basePath));
+app.use('/api-docs', oauth2RedirectSimple(basePath));
 
 // Servir el JSON de Swagger
 app.get('/api-docs/swagger.json', (req, res) => {
