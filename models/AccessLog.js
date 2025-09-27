@@ -110,6 +110,10 @@ class AccessLog {
             const limitNum = parseInt(limit) || 50;
             const offsetNum = parseInt(offset) || 0;
             
+            // Debug: mostrar parámetros antes de ejecutar
+            console.log('SQL Query:', sql);
+            console.log('SQL Params:', [...params, limitNum, offsetNum]);
+            
             params.push(limitNum, offsetNum);
             
             const logs = await query(sql, params);
