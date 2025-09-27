@@ -7,8 +7,15 @@ require('dotenv').config();
 
 // Importar configuración y utilidades
 const { testConnection } = require('./config/database');
-const swaggerSpecs = require('./config/swagger');
+const { specs: swaggerSpecs, basePath } = require('./config/swagger');
 const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
+const { 
+    proxyHandler, 
+    swaggerProxyHandler, 
+    swaggerStaticHandler, 
+    swaggerCorsHandler,
+    urlGenerator 
+} = require('./middleware/proxyHandler');
 
 // Importar rutas
 const cardsRoutes = require('./routes/cards');
@@ -45,6 +52,10 @@ app.use(limiter);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Middleware para manejar proxy inverso
+app.use(proxyHandler);
+app.use(urlGenerator);
+
 // Middleware para logging de requests
 app.use((req, res, next) => {
     const timestamp = new Date().toISOString();
@@ -76,40 +87,72 @@ app.get('/health', async (req, res) => {
     }
 });
 
-// Documentación Swagger
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs, {
+// Configurar Swagger UI para trabajar con proxy inverso
+const swaggerOptions = {
     customCss: '.swagger-ui .topbar { display: none }',
     customSiteTitle: 'NFC Access API - Documentación',
     swaggerOptions: {
         docExpansion: 'none',
         filter: true,
         showRequestHeaders: true,
-        showCommonExtensions: true
-    }
-}));
+        showCommonExtensions: true,
+        // Configuración para proxy inverso
+        url: basePath ? `${basePath}/api-docs/swagger.json` : '/api-docs/swagger.json',
+        validatorUrl: null, // Deshabilitar validación externa
+        // Configurar URLs base para recursos estáticos
+        deepLinking: true,
+        displayRequestDuration: true,
+        tryItOutEnabled: true
+    },
+    // Configurar rutas para recursos estáticos
+    customJs: [
+        'https://unpkg.com/swagger-ui-dist@4.15.5/swagger-ui-bundle.js',
+        'https://unpkg.com/swagger-ui-dist@4.15.5/swagger-ui-standalone-preset.js'
+    ],
+    customCssUrl: 'https://unpkg.com/swagger-ui-dist@4.15.5/swagger-ui.css'
+};
+
+// Middleware específico para Swagger UI
+app.use('/api-docs', swaggerCorsHandler);
+app.use('/api-docs', swaggerProxyHandler);
+app.use('/api-docs', swaggerStaticHandler);
+
+// Servir el JSON de Swagger
+app.get('/api-docs/swagger.json', (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.send(swaggerSpecs);
+});
+
+// Documentación Swagger UI
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs, swaggerOptions));
 
 // Ruta raíz con información de la API
 app.get('/', (req, res) => {
+    const apiPrefix = basePath || '';
+    
     res.json({
         success: true,
         message: 'API NFC Access - Sistema de gestión de acceso vehicular',
         version: '1.0.0',
-        documentation: '/api-docs',
-        health: '/health',
+        documentation: `${apiPrefix}/api-docs`,
+        health: `${apiPrefix}/health`,
+        swaggerJson: `${apiPrefix}/api-docs/swagger.json`,
+        basePath: apiPrefix,
         endpoints: {
             cards: {
-                register: 'POST /cards/register',
-                getByUser: 'GET /cards/:wp_user_id',
-                getOwner: 'GET /cards/owner/:card_uid',
-                search: 'GET /cards/search',
-                deactivate: 'PUT /cards/deactivate/:card_uid'
+                register: `POST ${apiPrefix}/cards/register`,
+                getByUser: `GET ${apiPrefix}/cards/:wp_user_id`,
+                getOwner: `GET ${apiPrefix}/cards/owner/:card_uid`,
+                search: `GET ${apiPrefix}/cards/search`,
+                deactivate: `PUT ${apiPrefix}/cards/deactivate/:card_uid`
             },
             access: {
-                log: 'POST /access/log',
-                getLogs: 'GET /access/logs/:wp_user_id',
-                getStats: 'GET /access/stats/:wp_user_id',
-                getLastAccess: 'GET /access/last/:card_uid',
-                getTodaySummary: 'GET /access/today-summary'
+                log: `POST ${apiPrefix}/access/log`,
+                getLogs: `GET ${apiPrefix}/access/logs/:wp_user_id`,
+                getStats: `GET ${apiPrefix}/access/stats/:wp_user_id`,
+                getLastAccess: `GET ${apiPrefix}/access/last/:card_uid`,
+                getTodaySummary: `GET ${apiPrefix}/access/today-summary`
             }
         }
     });

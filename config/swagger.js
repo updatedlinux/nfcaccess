@@ -1,5 +1,9 @@
 const swaggerJSDoc = require('swagger-jsdoc');
 
+// Detectar si estamos en producción o desarrollo
+const isProduction = process.env.NODE_ENV === 'production';
+const basePath = isProduction ? '/nfc_access' : '';
+
 const options = {
     definition: {
         openapi: '3.0.0',
@@ -111,4 +115,7 @@ const options = {
 
 const specs = swaggerJSDoc(options);
 
-module.exports = specs;
+module.exports = {
+    specs,
+    basePath
+};
