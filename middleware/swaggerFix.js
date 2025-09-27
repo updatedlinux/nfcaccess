@@ -72,14 +72,30 @@ function generateSwaggerHTML(basePath) {
             margin: 20px;
             color: #d63031;
         }
+        .debug-info {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: #333;
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            z-index: 9999;
+        }
     </style>
 </head>
 <body>
+    <div class="debug-info" id="debug-info">
+        Iniciando Swagger UI...
+    </div>
+    
     <div id="swagger-ui">
         <div class="loading-container">
             <div>Cargando documentación de la API...</div>
         </div>
     </div>
+    
     <div id="error-container" class="error-container">
         <strong>Error:</strong> <span id="error-message"></span>
     </div>
@@ -87,10 +103,38 @@ function generateSwaggerHTML(basePath) {
     <script src="https://unpkg.com/swagger-ui-dist@4.15.5/swagger-ui-bundle.js"></script>
     <script src="https://unpkg.com/swagger-ui-dist@4.15.5/swagger-ui-standalone-preset.js"></script>
     <script>
-        // Configuración simplificada de Swagger UI
+        // Función para actualizar debug info
+        function updateDebug(message) {
+            const debugEl = document.getElementById('debug-info');
+            if (debugEl) {
+                debugEl.textContent = message;
+            }
+            console.log(message);
+        }
+        
+        // Verificar que los scripts se cargaron
+        updateDebug('Verificando scripts...');
+        
+        if (typeof SwaggerUIBundle === 'undefined') {
+            updateDebug('ERROR: SwaggerUIBundle no está disponible');
+            document.getElementById('error-container').style.display = 'block';
+            document.getElementById('error-message').textContent = 'Error: SwaggerUIBundle no está disponible';
+            return;
+        }
+        
+        if (typeof SwaggerUIStandalonePreset === 'undefined') {
+            updateDebug('ERROR: SwaggerUIStandalonePreset no está disponible');
+            document.getElementById('error-container').style.display = 'block';
+            document.getElementById('error-message').textContent = 'Error: SwaggerUIStandalonePreset no está disponible';
+            return;
+        }
+        
+        updateDebug('Scripts cargados correctamente');
+        
+        // Configuración de Swagger UI
         window.onload = function() {
             try {
-                console.log('Iniciando Swagger UI...');
+                updateDebug('Iniciando configuración de Swagger UI...');
                 
                 const ui = SwaggerUIBundle({
                     url: '${swaggerJsonUrl}',
@@ -114,21 +158,29 @@ function generateSwaggerHTML(basePath) {
                         }
                     ],
                     onComplete: function() {
-                        console.log('Swagger UI cargado correctamente');
+                        updateDebug('✅ Swagger UI cargado exitosamente');
+                        document.getElementById('debug-info').style.display = 'none';
                     },
                     onFailure: function(data) {
-                        console.error('Error al cargar Swagger UI:', data);
+                        updateDebug('❌ Error al cargar Swagger UI: ' + JSON.stringify(data));
                         document.getElementById('error-container').style.display = 'block';
-                        document.getElementById('error-message').textContent = 'Error al cargar la documentación de la API: ' + JSON.stringify(data);
+                        document.getElementById('error-message').textContent = 'Error al cargar la documentación: ' + JSON.stringify(data);
                     }
                 });
                 
+                updateDebug('Configuración de Swagger UI completada');
+                
             } catch (error) {
-                console.error('Error al inicializar Swagger UI:', error);
+                updateDebug('❌ Error al inicializar: ' + error.message);
                 document.getElementById('error-container').style.display = 'block';
-                document.getElementById('error-message').textContent = 'Error al inicializar la documentación: ' + error.message;
+                document.getElementById('error-message').textContent = 'Error al inicializar: ' + error.message;
             }
         };
+        
+        // Fallback si window.onload ya se ejecutó
+        if (document.readyState === 'complete') {
+            window.onload();
+        }
     </script>
 </body>
 </html>`;
