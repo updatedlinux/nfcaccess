@@ -20,6 +20,9 @@ const {
     swaggerUIFix, 
     oauth2RedirectHandler 
 } = require('./middleware/swaggerFix');
+const { 
+    swaggerUILocal 
+} = require('./middleware/swaggerLocal');
 
 // Importar rutas
 const cardsRoutes = require('./routes/cards');
@@ -31,8 +34,21 @@ const PORT = process.env.PORT || 5000;
 // Configurar Express para trabajar con proxy inverso
 app.set('trust proxy', true);
 
-// Configuración de seguridad
-app.use(helmet());
+// Configuración de seguridad con CSP personalizado para Swagger UI
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            styleSrc: ["'self'", "'unsafe-inline'", "https://unpkg.com"],
+            scriptSrc: ["'self'", "'unsafe-inline'", "https://unpkg.com"],
+            connectSrc: ["'self'", "https://unpkg.com"],
+            imgSrc: ["'self'", "data:", "https:"],
+            fontSrc: ["'self'", "https:", "data:"],
+            objectSrc: ["'none'"],
+            upgradeInsecureRequests: [],
+        },
+    },
+}));
 
 // Configuración de CORS - abierto para integración
 app.use(cors({
@@ -148,7 +164,8 @@ app.use('/api-docs', swaggerProxyHandler);
 app.use('/api-docs', swaggerStaticHandler);
 
 // Middleware para interceptar y corregir redirecciones de Swagger UI
-app.use('/api-docs', swaggerUIFix(basePath));
+// Usar versión local que no depende de recursos externos
+app.use('/api-docs', swaggerUILocal(basePath));
 app.use('/api-docs', oauth2RedirectHandler(basePath));
 
 // Servir el JSON de Swagger
