@@ -182,10 +182,14 @@ function generateLocalSwaggerHTML(basePath) {
         function loadSwaggerUI() {
             updateDebug('Cargando JSON de Swagger...');
             
-            fetch('/api-docs/swagger.json')
+            // Usar la URL completa con el prefijo correcto
+            const jsonUrl = '${basePath}/api-docs/swagger.json';
+            updateDebug('URL del JSON: ' + jsonUrl);
+            
+            fetch(jsonUrl)
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error('Error al cargar JSON: ' + response.status);
+                        throw new Error('Error al cargar JSON: ' + response.status + ' - URL: ' + jsonUrl);
                     }
                     return response.json();
                 })
