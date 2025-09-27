@@ -93,6 +93,49 @@ class AccessLog {
                 };
             }
             
+            // Verificar si el usuario tiene tarjetas registradas
+            const cardsCheck = await query('SELECT COUNT(*) as count FROM condo360_nfc_cards WHERE wp_user_id = ?', [userId]);
+            if (cardsCheck[0].count === 0) {
+                return {
+                    success: true,
+                    message: 'Usuario no tiene tarjetas registradas',
+                    data: {
+                        logs: [],
+                        pagination: {
+                            total: 0,
+                            limit: parseInt(limit) || 50,
+                            offset: parseInt(offset) || 0,
+                            has_more: false
+                        }
+                    }
+                };
+            }
+            
+            // Verificar si hay logs de acceso
+            const logsCheck = await query(`
+                SELECT COUNT(*) as count 
+                FROM condo360_access_logs al
+                INNER JOIN condo360_nfc_cards c ON al.card_id = c.id
+                WHERE c.wp_user_id = ?
+            `, [userId]);
+            
+            if (logsCheck[0].count === 0) {
+                return {
+                    success: true,
+                    message: 'No se encontraron registros de acceso',
+                    data: {
+                        logs: [],
+                        pagination: {
+                            total: 0,
+                            limit: parseInt(limit) || 50,
+                            offset: parseInt(offset) || 0,
+                            has_more: false
+                        }
+                    }
+                };
+            }
+            
+            // Si hay datos, ejecutar la consulta completa
             let sql = `
                 SELECT 
                     al.id,
@@ -128,10 +171,6 @@ class AccessLog {
             // Asegurar que limit y offset sean números enteros válidos
             const limitNum = parseInt(limit) || 50;
             const offsetNum = parseInt(offset) || 0;
-            
-            // Debug: mostrar parámetros antes de ejecutar
-            console.log('SQL Query:', sql);
-            console.log('SQL Params:', [...params, limitNum, offsetNum]);
             
             params.push(limitNum, offsetNum);
             
