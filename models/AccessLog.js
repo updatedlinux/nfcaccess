@@ -174,6 +174,13 @@ class AccessLog {
             
             params.push(limitNum, offsetNum);
             
+            // Debug temporal
+            console.log('=== DEBUG ACCESS LOGS ===');
+            console.log('SQL Query:', sql);
+            console.log('SQL Params:', params);
+            console.log('Params types:', params.map(p => typeof p));
+            console.log('========================');
+            
             const logs = await query(sql, params);
             
             // Formatear fechas para mostrar
