@@ -69,6 +69,11 @@ class AccessLog {
         const { limit = 50, offset = 0, start_date, end_date } = options;
         
         try {
+            // Validar que wp_user_id sea un número entero
+            const userId = parseInt(wp_user_id);
+            if (isNaN(userId) || userId <= 0) {
+                throw new Error('ID de usuario inválido');
+            }
             let sql = `
                 SELECT 
                     al.id,
@@ -86,7 +91,7 @@ class AccessLog {
                 WHERE c.wp_user_id = ?
             `;
             
-            const params = [wp_user_id];
+            const params = [userId];
             
             // Agregar filtros de fecha si se proporcionan
             if (start_date) {
@@ -101,6 +106,9 @@ class AccessLog {
             
             sql += ' ORDER BY al.timestamp DESC LIMIT ? OFFSET ?';
             params.push(parseInt(limit), parseInt(offset));
+            
+            console.log('SQL Query:', sql);
+            console.log('SQL Params:', params);
             
             const logs = await query(sql, params);
             
@@ -119,7 +127,7 @@ class AccessLog {
                 WHERE c.wp_user_id = ?
             `;
             
-            const countParams = [wp_user_id];
+            const countParams = [userId];
             
             if (start_date) {
                 countSql += ' AND DATE(al.timestamp) >= ?';

@@ -84,6 +84,7 @@ class AccessController {
             
         } catch (error) {
             console.error('Error en getAccessLogsByUserId:', error.message);
+            console.error('Parámetros recibidos:', { wp_user_id, limit, offset, start_date, end_date });
             res.status(500).json({
                 success: false,
                 message: error.message
