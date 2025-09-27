@@ -135,12 +135,38 @@ class AccessLog {
                 };
             }
             
-            // Consulta simplificada para debug
+            // Usar consultas separadas para evitar problemas con prepared statements
             const limitNum = parseInt(limit) || 50;
             const offsetNum = parseInt(offset) || 0;
             
-            // Primero probar una consulta muy simple
-            let sql = `
+            // Primero obtener los IDs de las tarjetas del usuario
+            const cardsQuery = 'SELECT id FROM condo360_nfc_cards WHERE wp_user_id = ?';
+            const cards = await query(cardsQuery, [userId]);
+            
+            if (cards.length === 0) {
+                return {
+                    success: true,
+                    message: 'Usuario no tiene tarjetas registradas',
+                    data: {
+                        logs: [],
+                        pagination: {
+                            total: 0,
+                            limit: limitNum,
+                            offset: offsetNum,
+                            has_more: false
+                        }
+                    }
+                };
+            }
+            
+            // Obtener los IDs de las tarjetas
+            const cardIds = cards.map(card => card.id);
+            
+            // Crear placeholders para la consulta IN
+            const placeholders = cardIds.map(() => '?').join(',');
+            
+            // Consulta principal sin JOINs complejos
+            const sql = `
                 SELECT 
                     al.id,
                     al.access_type,
@@ -154,21 +180,17 @@ class AccessLog {
                 FROM condo360_access_logs al
                 INNER JOIN condo360_nfc_cards c ON al.card_id = c.id
                 INNER JOIN wp_users u ON c.wp_user_id = u.ID
-                WHERE c.wp_user_id = ?
+                WHERE al.card_id IN (${placeholders})
                 ORDER BY al.timestamp DESC
                 LIMIT ? OFFSET ?
             `;
             
-            const params = [userId, limitNum, offsetNum];
+            const params = [...cardIds, limitNum, offsetNum];
             
-            // Debug temporal
             console.log('=== DEBUG ACCESS LOGS ===');
+            console.log('Card IDs:', cardIds);
             console.log('SQL Query:', sql);
             console.log('SQL Params:', params);
-            console.log('Params types:', params.map(p => typeof p));
-            console.log('User ID:', userId, typeof userId);
-            console.log('Limit:', limitNum, typeof limitNum);
-            console.log('Offset:', offsetNum, typeof offsetNum);
             console.log('========================');
             
             const logs = await query(sql, params);
