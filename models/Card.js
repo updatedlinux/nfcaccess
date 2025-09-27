@@ -189,7 +189,7 @@ class Card {
             
             return {
                 success: true,
-                message: 'Búsqueda completada exitosamente',
+                message: cards.length > 0 ? 'Búsqueda completada exitosamente' : 'No se encontraron tarjetas',
                 data: cards
             };
             
