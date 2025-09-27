@@ -23,6 +23,9 @@ const {
 const { 
     swaggerUILocal 
 } = require('./middleware/swaggerLocal');
+const { 
+    swaggerInterceptor 
+} = require('./middleware/swaggerInterceptor');
 
 // Importar rutas
 const cardsRoutes = require('./routes/cards');
@@ -121,7 +124,7 @@ const swaggerOptions = {
     customCss: '.swagger-ui .topbar { display: none }',
     customSiteTitle: 'NFC Access API - Documentación',
     swaggerOptions: {
-        docExpansion: 'none',
+        docExpansion: 'list',
         filter: true,
         showRequestHeaders: true,
         showCommonExtensions: true,
@@ -142,18 +145,14 @@ const swaggerOptions = {
                 url: basePath || '',
                 description: 'Servidor actual'
             }
-        ]
-    },
-    // Configurar rutas para recursos estáticos desde CDN
-    customJs: [
-        'https://unpkg.com/swagger-ui-dist@4.15.5/swagger-ui-bundle.js',
-        'https://unpkg.com/swagger-ui-dist@4.15.5/swagger-ui-standalone-preset.js'
-    ],
-    customCssUrl: 'https://unpkg.com/swagger-ui-dist@4.15.5/swagger-ui.css',
-    // Configuración específica para evitar redirecciones
-    swaggerUiOptions: {
-        swaggerOptions: {
-            url: basePath ? `${basePath}/api-docs/swagger.json` : '/api-docs/swagger.json'
+        ],
+        // Configuración adicional para funcionalidad completa
+        supportedSubmitMethods: ['get', 'post', 'put', 'delete', 'patch'],
+        onComplete: function() {
+            console.log('Swagger UI cargado correctamente');
+        },
+        onFailure: function(data) {
+            console.error('Error al cargar Swagger UI:', data);
         }
     }
 };
@@ -163,9 +162,11 @@ app.use('/api-docs', swaggerCorsHandler);
 app.use('/api-docs', swaggerProxyHandler);
 app.use('/api-docs', swaggerStaticHandler);
 
+// Middleware para interceptar y corregir URLs de Swagger UI
+app.use('/api-docs', swaggerInterceptor(basePath));
+
 // Middleware para interceptar y corregir redirecciones de Swagger UI
-// Usar versión local que no depende de recursos externos
-app.use('/api-docs', swaggerUILocal(basePath));
+app.use('/api-docs', swaggerUIFix(basePath));
 app.use('/api-docs', oauth2RedirectHandler(basePath));
 
 // Servir el JSON de Swagger
@@ -175,8 +176,8 @@ app.get('/api-docs/swagger.json', (req, res) => {
     res.send(swaggerSpecs);
 });
 
-// Documentación Swagger UI (comentado para usar HTML personalizado)
-// app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs, swaggerOptions));
+// Documentación Swagger UI con configuración completa
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs, swaggerOptions));
 
 // Ruta raíz con información de la API
 app.get('/', (req, res) => {
