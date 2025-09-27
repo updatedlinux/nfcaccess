@@ -159,13 +159,6 @@ class AccessLog {
                 LIMIT ${limitNum} OFFSET ${offsetNum}
             `;
             
-            console.log('=== DEBUG ACCESS LOGS ===');
-            console.log('SQL Query:', sql);
-            console.log('User ID:', userId);
-            console.log('Limit:', limitNum);
-            console.log('Offset:', offsetNum);
-            console.log('========================');
-            
             const logs = await query(sql);
             
             // Formatear fechas para mostrar
