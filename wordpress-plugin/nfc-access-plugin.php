@@ -349,22 +349,22 @@ class NFC_Access_Plugin {
             </div>
             
             <div class="admin-tabs">
-                <button class="tab-button active" data-tab="search-cards"><?php _e('Buscar Tarjetas', 'nfc-access'); ?></button>
+                <button class="tab-button active" data-tab="search-cards"><?php _e('Buscar Propietario', 'nfc-access'); ?></button>
                 <button class="tab-button" data-tab="access-summary"><?php _e('Resumen del Día', 'nfc-access'); ?></button>
             </div>
             
-            <!-- Tab: Buscar Tarjetas -->
+            <!-- Tab: Buscar Propietario -->
             <div class="tab-content active" id="search-cards">
                 <div class="search-section">
                     <div class="search-form">
-                        <input type="text" id="user-search" placeholder="<?php _e('Buscar por nombre, email o login...', 'nfc-access'); ?>" class="nfc-input">
+                        <input type="text" id="user-search" placeholder="<?php _e('Buscar por nombre, email o login de propietario...', 'nfc-access'); ?>" class="nfc-input">
                         <button type="button" id="search-users" class="nfc-button nfc-button-primary">
                             <?php _e('Buscar', 'nfc-access'); ?>
                         </button>
                     </div>
                     
                     <div class="search-results" id="search-results">
-                        <p class="search-placeholder"><?php _e('Ingrese un término de búsqueda para comenzar', 'nfc-access'); ?></p>
+                        <p class="search-placeholder"><?php _e('Ingrese un término de búsqueda para buscar propietarios', 'nfc-access'); ?></p>
                     </div>
                 </div>
             </div>
@@ -453,7 +453,7 @@ class NFC_Access_Plugin {
             
             function displaySearchResults(cards) {
                 if (cards.length === 0) {
-                    $('#search-results').html('<div class="nfc-access-no-data"><?php _e("No se encontraron tarjetas", "nfc-access"); ?></div>');
+                    $('#search-results').html('<div class="nfc-access-no-data"><?php _e("No se encontraron propietarios", "nfc-access"); ?></div>');
                     return;
                 }
                 

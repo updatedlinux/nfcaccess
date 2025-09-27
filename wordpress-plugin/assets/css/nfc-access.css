@@ -706,30 +706,51 @@
     outline-offset: 2px;
 }
 
-/* Compatibilidad con temas oscuros */
+/* Forzar modo claro - deshabilitar tema oscuro */
 @media (prefers-color-scheme: dark) {
     :root {
-        --nfc-light-color: #2d3748;
-        --nfc-dark-color: #e2e8f0;
-        --nfc-border-color: #4a5568;
+        --nfc-light-color: #f9fafb;
+        --nfc-dark-color: #1f2937;
+        --nfc-border-color: #e5e7eb;
+        --nfc-background: #ffffff;
+        --nfc-text-primary: #111827;
+        --nfc-text-secondary: #6b7280;
     }
     
     .nfc-access-container,
     .nfc-access-admin-container {
-        background: #1a202c;
-        color: #e2e8f0;
+        background: #ffffff !important;
+        color: #111827 !important;
+        border: 1px solid #e5e7eb !important;
     }
     
     .card-item {
-        background: #2d3748;
-        border-color: #4a5568;
+        background: #ffffff !important;
+        border-color: #e5e7eb !important;
+        color: #111827 !important;
     }
     
     .nfc-logs-table {
-        background: #2d3748;
+        background: #ffffff !important;
+        color: #111827 !important;
     }
     
     .nfc-logs-table th {
-        background-color: var(--nfc-primary-color);
+        background-color: var(--nfc-primary-color) !important;
+        color: white !important;
+    }
+    
+    .nfc-logs-table td {
+        color: #111827 !important;
+    }
+    
+    .stat-item {
+        background: #f9fafb !important;
+        color: #111827 !important;
+    }
+    
+    .summary-stat {
+        background: #f9fafb !important;
+        color: #111827 !important;
     }
 }

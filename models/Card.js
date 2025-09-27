@@ -189,7 +189,7 @@ class Card {
             
             return {
                 success: true,
-                message: cards.length > 0 ? 'Búsqueda completada exitosamente' : 'No se encontraron tarjetas',
+                message: cards.length > 0 ? 'Búsqueda completada exitosamente' : 'No se encontraron propietarios con tarjetas registradas',
                 data: cards
             };
             
