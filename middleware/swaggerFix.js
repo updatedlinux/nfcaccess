@@ -27,8 +27,9 @@ function swaggerUIFix(basePath = '') {
  * Generar HTML personalizado para Swagger UI
  */
 function generateSwaggerHTML(basePath) {
-    const swaggerJsonUrl = basePath ? `${basePath}/api-docs/swagger.json` : '/api-docs/swagger.json';
-    const oauth2RedirectUrl = basePath ? `${basePath}/api-docs/oauth2-redirect.html` : '/api-docs/oauth2-redirect.html';
+    // Usar URL relativa para evitar problemas de CORS
+    const swaggerJsonUrl = '/api-docs/swagger.json';
+    const oauth2RedirectUrl = '/api-docs/oauth2-redirect.html';
     
     return `<!DOCTYPE html>
 <html lang="es">
@@ -53,17 +54,6 @@ function generateSwaggerHTML(basePath) {
         }
         .swagger-ui .topbar { 
             display: none; 
-        }
-        .swagger-ui .info .title {
-            color: #3b4151;
-            font-size: 36px;
-            font-weight: 600;
-            margin: 0 0 10px 0;
-        }
-        .swagger-ui .info .description {
-            color: #3b4151;
-            font-size: 16px;
-            margin: 0 0 20px 0;
         }
         .loading-container {
             display: flex;
@@ -97,19 +87,11 @@ function generateSwaggerHTML(basePath) {
     <script src="https://unpkg.com/swagger-ui-dist@4.15.5/swagger-ui-bundle.js"></script>
     <script src="https://unpkg.com/swagger-ui-dist@4.15.5/swagger-ui-standalone-preset.js"></script>
     <script>
-        // Configuración para evitar redirecciones incorrectas
-        window.addEventListener('beforeunload', function(e) {
-            // Prevenir redirecciones no deseadas
-            const currentUrl = window.location.href;
-            if (!currentUrl.includes('/nfc_access/api-docs')) {
-                e.preventDefault();
-                e.returnValue = '';
-            }
-        });
-        
-        // Configuración de Swagger UI
+        // Configuración simplificada de Swagger UI
         window.onload = function() {
             try {
+                console.log('Iniciando Swagger UI...');
+                
                 const ui = SwaggerUIBundle({
                     url: '${swaggerJsonUrl}',
                     dom_id: '#swagger-ui',
@@ -131,84 +113,21 @@ function generateSwaggerHTML(basePath) {
                             description: 'Servidor actual'
                         }
                     ],
-                    // Configuración adicional para evitar redirecciones
                     onComplete: function() {
                         console.log('Swagger UI cargado correctamente');
-                        
-                        // Interceptar clicks en enlaces que podrían causar redirecciones
-                        document.addEventListener('click', function(e) {
-                            const target = e.target;
-                            if (target.tagName === 'A' && target.href) {
-                                const href = target.href;
-                                if (href.includes('/api-docs') && !href.includes('/nfc_access/api-docs')) {
-                                    e.preventDefault();
-                                    const correctedUrl = href.replace('/api-docs', '/nfc_access/api-docs');
-                                    window.location.href = correctedUrl;
-                                }
-                            }
-                        });
-                        
-                        // Interceptar formularios que podrían causar redirecciones
-                        document.addEventListener('submit', function(e) {
-                            const form = e.target;
-                            if (form.action && form.action.includes('/api-docs') && !form.action.includes('/nfc_access/api-docs')) {
-                                e.preventDefault();
-                                const correctedAction = form.action.replace('/api-docs', '/nfc_access/api-docs');
-                                form.action = correctedAction;
-                                form.submit();
-                            }
-                        });
                     },
                     onFailure: function(data) {
                         console.error('Error al cargar Swagger UI:', data);
                         document.getElementById('error-container').style.display = 'block';
-                        document.getElementById('error-message').textContent = 'Error al cargar la documentación de la API';
+                        document.getElementById('error-message').textContent = 'Error al cargar la documentación de la API: ' + JSON.stringify(data);
                     }
                 });
-                
-                // Configurar interceptor para requests
-                if (window.SwaggerUIBundle && window.SwaggerUIBundle.plugins) {
-                    const interceptor = {
-                        wrapComponents: {
-                            BaseLayout: (OriginalComponent, system) => {
-                                return (props) => {
-                                    // Interceptar y corregir URLs en el componente
-                                    const correctedProps = { ...props };
-                                    if (correctedProps.spec && correctedProps.spec.servers) {
-                                        correctedProps.spec.servers = correctedProps.spec.servers.map(server => ({
-                                            ...server,
-                                            url: server.url.startsWith('/') ? '${basePath}' + server.url : server.url
-                                        }));
-                                    }
-                                    return system.React.createElement(OriginalComponent, correctedProps);
-                                };
-                            }
-                        }
-                    };
-                    
-                    ui.plugins.push(interceptor);
-                }
                 
             } catch (error) {
                 console.error('Error al inicializar Swagger UI:', error);
                 document.getElementById('error-container').style.display = 'block';
                 document.getElementById('error-message').textContent = 'Error al inicializar la documentación: ' + error.message;
             }
-        };
-        
-        // Prevenir redirecciones automáticas del navegador
-        window.history.pushState = function(state, title, url) {
-            if (url && url.includes('/api-docs') && !url.includes('/nfc_access/api-docs')) {
-                url = url.replace('/api-docs', '/nfc_access/api-docs');
-            }
-            return window.history.pushState.apply(window.history, arguments);
-        };
-        
-        window.history.replaceState = function(state, title, url) {
-            if (url && url.includes('/api-docs') && !url.includes('/nfc_access/api-docs')) {
-                url = url.replace('/api-docs', '/nfc_access/api-docs');
-            }
-            return window.history.replaceState.apply(window.history, arguments);
         };
     </script>
 </body>
