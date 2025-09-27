@@ -42,7 +42,7 @@ app.use(cors({
     credentials: false
 }));
 
-// Rate limiting con configuración para proxy inverso
+// Rate limiting con configuración específica para proxy inverso
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutos
     max: 1000, // máximo 1000 requests por ventana
@@ -52,11 +52,11 @@ const limiter = rateLimit({
     },
     standardHeaders: true,
     legacyHeaders: false,
-    // Configuración para proxy inverso
-    trustProxy: true,
+    // Configuración específica para proxy inverso
+    trustProxy: 1, // Solo confiar en el primer proxy
     skip: (req) => {
-        // Saltar rate limiting para requests de salud
-        return req.path === '/health';
+        // Saltar rate limiting para requests de salud y documentación
+        return req.path === '/health' || req.path.startsWith('/api-docs');
     }
 });
 app.use(limiter);

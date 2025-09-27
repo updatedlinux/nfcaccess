@@ -10,7 +10,6 @@ const dbConfig = {
     database: process.env.DB_NAME || 'wordpress_db',
     charset: 'utf8mb4',
     timezone: '+00:00', // UTC para evitar problemas de zona horaria
-    acquireTimeout: 60000,
     connectionLimit: 10,
     queueLimit: 0
 };
