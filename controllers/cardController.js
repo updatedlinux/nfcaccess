@@ -137,6 +137,7 @@ class CardController {
             
         } catch (error) {
             console.error('Error en searchCardsByUser:', error.message);
+            console.error('Parámetros recibidos:', { search: req.query.search });
             res.status(500).json({
                 success: false,
                 message: error.message
