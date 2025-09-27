@@ -11,8 +11,6 @@ const dbConfig = {
     charset: 'utf8mb4',
     timezone: '+00:00', // UTC para evitar problemas de zona horaria
     acquireTimeout: 60000,
-    timeout: 60000,
-    reconnect: true,
     connectionLimit: 10,
     queueLimit: 0
 };

@@ -28,6 +28,9 @@ const accessRoutes = require('./routes/access');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Configurar Express para trabajar con proxy inverso
+app.set('trust proxy', true);
+
 // Configuración de seguridad
 app.use(helmet());
 
@@ -39,7 +42,7 @@ app.use(cors({
     credentials: false
 }));
 
-// Rate limiting
+// Rate limiting con configuración para proxy inverso
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutos
     max: 1000, // máximo 1000 requests por ventana
@@ -48,7 +51,13 @@ const limiter = rateLimit({
         message: 'Demasiadas solicitudes desde esta IP, intente nuevamente más tarde'
     },
     standardHeaders: true,
-    legacyHeaders: false
+    legacyHeaders: false,
+    // Configuración para proxy inverso
+    trustProxy: true,
+    skip: (req) => {
+        // Saltar rate limiting para requests de salud
+        return req.path === '/health';
+    }
 });
 app.use(limiter);
 
