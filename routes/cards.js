@@ -71,20 +71,20 @@ router.post('/register', CardController.registerCard);
 
 /**
  * @swagger
- * /cards/{wp_user_id}:
+ * /cards/search:
  *   get:
- *     summary: Obtener tarjetas de un usuario
+ *     summary: Buscar tarjetas por usuario (administradores)
  *     tags: [Tarjetas]
  *     parameters:
- *       - in: path
- *         name: wp_user_id
+ *       - in: query
+ *         name: search
  *         required: true
  *         schema:
- *           type: integer
- *         description: ID del usuario de WordPress
+ *           type: string
+ *         description: Término de búsqueda (nombre, email o login)
  *     responses:
  *       200:
- *         description: Tarjetas obtenidas exitosamente
+ *         description: Búsqueda completada exitosamente
  *         content:
  *           application/json:
  *             schema:
@@ -92,7 +92,7 @@ router.post('/register', CardController.registerCard);
  *       400:
  *         description: Error en la solicitud
  */
-router.get('/:wp_user_id', CardController.getCardsByUserId);
+router.get('/search', CardController.searchCardsByUser);
 
 /**
  * @swagger
@@ -121,20 +121,20 @@ router.get('/owner/:card_uid', CardController.getOwnerByCardUid);
 
 /**
  * @swagger
- * /cards/search:
+ * /cards/{wp_user_id}:
  *   get:
- *     summary: Buscar tarjetas por usuario (administradores)
+ *     summary: Obtener tarjetas de un usuario
  *     tags: [Tarjetas]
  *     parameters:
- *       - in: query
- *         name: search
+ *       - in: path
+ *         name: wp_user_id
  *         required: true
  *         schema:
- *           type: string
- *         description: Término de búsqueda (nombre, email o login)
+ *           type: integer
+ *         description: ID del usuario de WordPress
  *     responses:
  *       200:
- *         description: Búsqueda completada exitosamente
+ *         description: Tarjetas obtenidas exitosamente
  *         content:
  *           application/json:
  *             schema:
@@ -142,7 +142,7 @@ router.get('/owner/:card_uid', CardController.getOwnerByCardUid);
  *       400:
  *         description: Error en la solicitud
  */
-router.get('/search', CardController.searchCardsByUser);
+router.get('/:wp_user_id', CardController.getCardsByUserId);
 
 /**
  * @swagger
