@@ -72,8 +72,8 @@ const limiter = rateLimit({
     },
     standardHeaders: true,
     legacyHeaders: false,
-    // Configuración específica para proxy inverso
-    trustProxy: 1, // Solo confiar en el primer proxy
+                // Configuración específica para proxy inverso
+                trustProxy: false, // Deshabilitar trust proxy para evitar bypass de rate limiting
     skip: (req) => {
         // Saltar rate limiting para requests de salud y documentación
         return req.path === '/health' || req.path.startsWith('/api-docs');

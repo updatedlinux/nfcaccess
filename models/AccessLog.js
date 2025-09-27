@@ -105,10 +105,12 @@ class AccessLog {
             }
             
             sql += ' ORDER BY al.timestamp DESC LIMIT ? OFFSET ?';
-            params.push(parseInt(limit), parseInt(offset));
             
-            console.log('SQL Query:', sql);
-            console.log('SQL Params:', params);
+            // Asegurar que limit y offset sean números enteros válidos
+            const limitNum = parseInt(limit) || 50;
+            const offsetNum = parseInt(offset) || 0;
+            
+            params.push(limitNum, offsetNum);
             
             const logs = await query(sql, params);
             
@@ -149,9 +151,9 @@ class AccessLog {
                     logs: formattedLogs,
                     pagination: {
                         total,
-                        limit,
-                        offset,
-                        has_more: offset + limit < total
+                        limit: limitNum,
+                        offset: offsetNum,
+                        has_more: offsetNum + limitNum < total
                     }
                 }
             };
