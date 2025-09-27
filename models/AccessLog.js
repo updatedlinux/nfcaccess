@@ -156,14 +156,14 @@ class AccessLog {
             const params = [userId];
             
             // Agregar filtros de fecha si se proporcionan
-            if (start_date) {
+            if (start_date && start_date.trim() !== '') {
                 sql += ' AND DATE(al.timestamp) >= ?';
-                params.push(start_date);
+                params.push(start_date.trim());
             }
             
-            if (end_date) {
+            if (end_date && end_date.trim() !== '') {
                 sql += ' AND DATE(al.timestamp) <= ?';
-                params.push(end_date);
+                params.push(end_date.trim());
             }
             
             sql += ' ORDER BY al.timestamp DESC LIMIT ? OFFSET ?';
@@ -171,6 +171,14 @@ class AccessLog {
             // Asegurar que limit y offset sean números enteros válidos
             const limitNum = parseInt(limit) || 50;
             const offsetNum = parseInt(offset) || 0;
+            
+            // Validar que los números sean válidos
+            if (isNaN(limitNum) || limitNum < 1) {
+                throw new Error('Límite inválido');
+            }
+            if (isNaN(offsetNum) || offsetNum < 0) {
+                throw new Error('Offset inválido');
+            }
             
             params.push(limitNum, offsetNum);
             
