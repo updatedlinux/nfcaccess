@@ -170,6 +170,7 @@ class Card {
                     c.label,
                     c.active,
                     c.created_at,
+                    c.wp_user_id,
                     u.user_login,
                     u.display_name,
                     u.user_email

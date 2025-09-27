@@ -5,18 +5,21 @@
 
 /* Variables CSS para consistencia con Astra */
 :root {
-    --nfc-primary-color: #007cba;
-    --nfc-secondary-color: #6c757d;
-    --nfc-success-color: #28a745;
-    --nfc-danger-color: #dc3545;
-    --nfc-warning-color: #ffc107;
-    --nfc-info-color: #17a2b8;
-    --nfc-light-color: #f8f9fa;
-    --nfc-dark-color: #343a40;
-    --nfc-border-color: #dee2e6;
-    --nfc-border-radius: 4px;
-    --nfc-box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    --nfc-primary-color: #0274be;
+    --nfc-secondary-color: #6b7280;
+    --nfc-success-color: #10b981;
+    --nfc-danger-color: #ef4444;
+    --nfc-warning-color: #f59e0b;
+    --nfc-info-color: #06b6d4;
+    --nfc-light-color: #f9fafb;
+    --nfc-dark-color: #1f2937;
+    --nfc-border-color: #e5e7eb;
+    --nfc-border-radius: 8px;
+    --nfc-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
     --nfc-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --nfc-background: #ffffff;
+    --nfc-text-primary: #111827;
+    --nfc-text-secondary: #6b7280;
 }
 
 /* Contenedor principal */
@@ -24,11 +27,12 @@
 .nfc-access-admin-container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 24px;
     font-family: var(--nfc-font-family);
-    background: #fff;
+    background: var(--nfc-background);
     border-radius: var(--nfc-border-radius);
     box-shadow: var(--nfc-box-shadow);
+    border: 1px solid var(--nfc-border-color);
 }
 
 /* Header */
@@ -39,16 +43,18 @@
 }
 
 .nfc-access-header h3 {
-    color: var(--nfc-dark-color);
-    margin: 0 0 10px 0;
-    font-size: 1.5rem;
-    font-weight: 600;
+    color: var(--nfc-text-primary);
+    margin: 0 0 8px 0;
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: 1.2;
 }
 
 .nfc-access-subtitle {
-    color: var(--nfc-secondary-color);
+    color: var(--nfc-text-secondary);
     margin: 0;
     font-size: 1rem;
+    font-weight: 400;
 }
 
 /* Estadísticas */
@@ -132,8 +138,9 @@
 }
 
 .nfc-button-primary:hover {
-    background-color: #005a87;
+    background-color: #0369a1;
     transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .nfc-button-secondary {

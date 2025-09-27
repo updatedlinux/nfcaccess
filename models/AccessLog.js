@@ -100,7 +100,7 @@ class AccessLog {
             }
             
             sql += ' ORDER BY al.timestamp DESC LIMIT ? OFFSET ?';
-            params.push(limit, offset);
+            params.push(parseInt(limit), parseInt(offset));
             
             const logs = await query(sql, params);
             
