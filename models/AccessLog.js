@@ -74,6 +74,25 @@ class AccessLog {
             if (isNaN(userId) || userId <= 0) {
                 throw new Error('ID de usuario inválido');
             }
+            
+            // Primero verificar si el usuario existe
+            const userCheck = await query('SELECT ID FROM wp_users WHERE ID = ?', [userId]);
+            if (userCheck.length === 0) {
+                return {
+                    success: true,
+                    message: 'Usuario no encontrado',
+                    data: {
+                        logs: [],
+                        pagination: {
+                            total: 0,
+                            limit: parseInt(limit) || 50,
+                            offset: parseInt(offset) || 0,
+                            has_more: false
+                        }
+                    }
+                };
+            }
+            
             let sql = `
                 SELECT 
                     al.id,
