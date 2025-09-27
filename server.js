@@ -16,6 +16,10 @@ const {
     swaggerCorsHandler,
     urlGenerator 
 } = require('./middleware/proxyHandler');
+const { 
+    swaggerUIFix, 
+    oauth2RedirectHandler 
+} = require('./middleware/swaggerFix');
 
 // Importar rutas
 const cardsRoutes = require('./routes/cards');
@@ -96,26 +100,47 @@ const swaggerOptions = {
         filter: true,
         showRequestHeaders: true,
         showCommonExtensions: true,
-        // Configuración para proxy inverso
+        // Configuración específica para proxy inverso
         url: basePath ? `${basePath}/api-docs/swagger.json` : '/api-docs/swagger.json',
         validatorUrl: null, // Deshabilitar validación externa
         // Configurar URLs base para recursos estáticos
         deepLinking: true,
         displayRequestDuration: true,
-        tryItOutEnabled: true
+        tryItOutEnabled: true,
+        // Configuración crítica para proxy inverso
+        oauth2RedirectUrl: basePath ? `${basePath}/api-docs/oauth2-redirect.html` : '/api-docs/oauth2-redirect.html',
+        // Deshabilitar redirecciones automáticas
+        persistAuthorization: true,
+        // Configurar servidor base
+        servers: [
+            {
+                url: basePath || '',
+                description: 'Servidor actual'
+            }
+        ]
     },
-    // Configurar rutas para recursos estáticos
+    // Configurar rutas para recursos estáticos desde CDN
     customJs: [
         'https://unpkg.com/swagger-ui-dist@4.15.5/swagger-ui-bundle.js',
         'https://unpkg.com/swagger-ui-dist@4.15.5/swagger-ui-standalone-preset.js'
     ],
-    customCssUrl: 'https://unpkg.com/swagger-ui-dist@4.15.5/swagger-ui.css'
+    customCssUrl: 'https://unpkg.com/swagger-ui-dist@4.15.5/swagger-ui.css',
+    // Configuración específica para evitar redirecciones
+    swaggerUiOptions: {
+        swaggerOptions: {
+            url: basePath ? `${basePath}/api-docs/swagger.json` : '/api-docs/swagger.json'
+        }
+    }
 };
 
 // Middleware específico para Swagger UI
 app.use('/api-docs', swaggerCorsHandler);
 app.use('/api-docs', swaggerProxyHandler);
 app.use('/api-docs', swaggerStaticHandler);
+
+// Middleware para interceptar y corregir redirecciones de Swagger UI
+app.use('/api-docs', swaggerUIFix(basePath));
+app.use('/api-docs', oauth2RedirectHandler(basePath));
 
 // Servir el JSON de Swagger
 app.get('/api-docs/swagger.json', (req, res) => {
@@ -124,8 +149,8 @@ app.get('/api-docs/swagger.json', (req, res) => {
     res.send(swaggerSpecs);
 });
 
-// Documentación Swagger UI
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs, swaggerOptions));
+// Documentación Swagger UI (comentado para usar HTML personalizado)
+// app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs, swaggerOptions));
 
 // Ruta raíz con información de la API
 app.get('/', (req, res) => {
