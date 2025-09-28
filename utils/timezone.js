@@ -26,17 +26,8 @@ function convertToGMTMinus4(date) {
  * @returns {string} Fecha en formato DD/MM/YYYY HH:mm A
  */
 function formatDateTimeAMPM(date) {
-    // Si la fecha viene de MySQL en UTC, convertirla a GMT-4
-    // Si ya está en GMT-4, no hacer conversión adicional
-    const momentDate = moment(date);
-    
-    // Si la fecha tiene 'Z' al final, significa que está en UTC
-    if (typeof date === 'string' && date.endsWith('Z')) {
-        return momentDate.tz(TIMEZONE).format('DD/MM/YYYY hh:mm A');
-    }
-    
-    // Si no tiene 'Z', asumir que ya está en la zona horaria local
-    return momentDate.format('DD/MM/YYYY hh:mm A');
+    // Con la configuración de MySQL en GMT-4, los timestamps ya están en la zona correcta
+    return moment(date).format('DD/MM/YYYY hh:mm A');
 }
 
 /**

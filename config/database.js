@@ -9,7 +9,7 @@ const dbConfig = {
     password: process.env.DB_PASSWORD || '',
     database: process.env.DB_NAME || 'wordpress_db',
     charset: 'utf8mb4',
-    timezone: '+00:00', // UTC para evitar problemas de zona horaria
+    timezone: '-04:00', // GMT-4 (Venezuela) para consistencia con la aplicación
     connectionLimit: 10,
     queueLimit: 0
 };
