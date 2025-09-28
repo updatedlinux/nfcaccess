@@ -164,6 +164,10 @@ class AccessController {
     static async getTodayAccessSummary(req, res) {
         try {
             const { query } = require('../config/database');
+            const { getCurrentDateTime } = require('../utils/timezone');
+            
+            // Obtener fecha actual en GMT-4
+            const currentDateGMT4 = getCurrentDateTime().split(' ')[0]; // YYYY-MM-DD
             
             const sql = `
                 SELECT 
@@ -175,12 +179,12 @@ class AccessController {
                 FROM condo360_access_logs al
                 INNER JOIN condo360_nfc_cards c ON al.card_id = c.id
                 INNER JOIN wp_users u ON c.wp_user_id = u.ID
-                WHERE DATE(al.timestamp) = CURDATE()
+                WHERE DATE(al.timestamp) = ?
                 GROUP BY al.access_type, c.card_uid, u.display_name, u.user_login
                 ORDER BY al.access_type, u.display_name
             `;
             
-            const results = await query(sql);
+            const results = await query(sql, [currentDateGMT4]);
             
             // Agrupar por tipo de acceso
             const summary = {
@@ -211,7 +215,7 @@ class AccessController {
                 success: true,
                 message: 'Resumen del día obtenido exitosamente',
                 data: {
-                    date: new Date().toISOString().split('T')[0],
+                    date: currentDateGMT4, // Usar fecha en GMT-4
                     summary
                 }
             });
