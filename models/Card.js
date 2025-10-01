@@ -19,7 +19,7 @@ class Card {
             const users = await query(userQuery, [wp_user_login]);
             
             if (users.length === 0) {
-                throw new Error(`Usuario '${wp_user_login}' no encontrado en WordPress`);
+                throw new Error(`Usuario '${wp_user_login}' no encontrado en Condominio360`);
             }
             
             const wp_user_id = users[0].ID;
